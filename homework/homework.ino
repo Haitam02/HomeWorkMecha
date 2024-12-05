@@ -11,24 +11,24 @@ enum RobotState {
 
 RobotState currentState = START;
 
-// Initialisation du Shield
+// Shield Initialization
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 
-// Moteur gauche sur MOTOR1
-Adafruit_DCMotor *moteurGauche = AFMS.getMotor(1);
+// Left motor on MOTOR1
+Adafruit_DCMotor *leftMotor = AFMS.getMotor(1);
 
-// Moteur droit sur MOTOR2
-Adafruit_DCMotor *moteurDroit = AFMS.getMotor(2);
+// Right motor on MOTOR2
+Adafruit_DCMotor *rightMotor = AFMS.getMotor(2);
 
 unsigned long startMillis; 
 unsigned long currentMillis;  
 
 void setup() {
-  // Initialiser le Shield
+  // Initialize the Shield
   AFMS.begin(); 
-  // Définir la vitesse initiale des moteurs (valeurs entre 0 et 255)
-  moteurGauche->setSpeed(30);
-  moteurDroit->setSpeed(30);
+  // Set the initial speed of the motors (values between 0 and 255)
+  leftMotor->setSpeed(30);
+  rightMotor->setSpeed(30);
   Serial.begin(9600);
   startMillis = millis();
 }
@@ -40,37 +40,35 @@ void loop() {
     currentState = STOP;
   }
 
-
   switch (currentState) {
     case START:
-      Serial.println("Robot en mode START");
-      moteurGauche->run(RELEASE);
-      moteurDroit->run(RELEASE);
-      }
-      
+      Serial.println("Robot in START mode");
+      leftMotor->run(RELEASE);
+      rightMotor->run(RELEASE);
       break;
 
     case GO:
-      Serial.println("Robot en mode GO");
-      moteurGauche->run(FORWARD);
-      moteurDroit->run(FORWARD);
+      Serial.println("Robot in GO mode");
+      leftMotor->run(FORWARD);
+      rightMotor->run(FORWARD);
       break;
 
     case BACK:
-      Serial.println("Robot en mode BACK");
-      moteurGauche->run(BACKWARD);
-      moteurDroit->run(BACKWARD);
+      Serial.println("Robot in BACK mode");
+      leftMotor->run(BACKWARD);
+      rightMotor->run(BACKWARD);
       break;
 
     case STOP:
-      Serial.println("Robot en mode STOP");
-      moteurGauche->run(RELEASE);
-      moteurDroit->run(RELEASE);
+      Serial.println("Robot in STOP mode");
+      leftMotor->run(RELEASE);
+      rightMotor->run(RELEASE);
       break;
 
     default:
-      Serial.println("Etat inconnu");
+      Serial.println("Unknown state");
       break;
-      
-    delay(1000);
+  }
+
+  delay(1000);
 }
