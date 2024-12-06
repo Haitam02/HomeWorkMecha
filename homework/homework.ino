@@ -33,7 +33,7 @@ void setup() {
   leftMotor->setSpeed(30);
   rightMotor->setSpeed(30);
   Serial.begin(9600);
-  BTSerial.begin(8600);
+  BTSerial.begin(9600);
   startMillis = millis();
 }
 
