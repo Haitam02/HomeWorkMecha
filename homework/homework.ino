@@ -1,6 +1,9 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include <NewPing.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BTSerial(12,11);
 
 enum RobotState {
   START,
@@ -30,6 +33,7 @@ void setup() {
   leftMotor->setSpeed(30);
   rightMotor->setSpeed(30);
   Serial.begin(9600);
+  BTSerial.begin(9600);
   startMillis = millis();
 }
 
@@ -71,4 +75,9 @@ void loop() {
   }
 
   delay(1000);
+}
+
+void sendBluetoothMessage(String message) {
+    BTSerial.println(message);
+    Serial.println("Sent: " + message);
 }
