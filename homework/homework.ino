@@ -3,6 +3,10 @@
 #include <NewPing.h>
 #include <SoftwareSerial.h>
 
+#define TRIG_PIN 9
+#define ECHO_PIN 10
+#define MAX_DISTANCE 50 // Distance maximum en cm pour les mesures
+
 SoftwareSerial BTSerial(12,11);
 
 enum RobotState {
@@ -12,7 +16,14 @@ enum RobotState {
   BACK,
 };
 
+unsigned int distance; 
+
 RobotState currentState = START;
+
+NewPing sonar(TRIG_PIN, ECHO_PIN, MAX_DISTANCE);
+
+//counter for the 5 times
+int count = 0; 
 
 // Shield Initialization
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
@@ -49,18 +60,58 @@ void loop() {
       Serial.println("Robot in START mode");
       leftMotor->run(RELEASE);
       rightMotor->run(RELEASE);
+
+      if(sensorMesure()){
+        count++;
+        Serial.print("Count: ");
+        Serial.println(count);
+        if(count == 5){
+          currentState = STOP; 
+        }else{
+          sendBluetoothMessage("Direction: GO");
+          currentState = GO; 
+        }
+      }
       break;
 
     case GO:
       Serial.println("Robot in GO mode");
       leftMotor->run(FORWARD);
       rightMotor->run(FORWARD);
+
+      if(sensorMesure()){
+        count++;
+        Serial.print("Count: ");
+        Serial.println(count);
+        if(count == 5){
+          currentState = STOP; 
+        }else{
+          moteurGauche->run(RELEASE);
+          moteurDroit->run(RELEASE);
+          delay(1000);
+          sendBluetoothMessage("Direction: BACK");
+          currentState = BACK; 
+        }
+      }
       break;
 
     case BACK:
       Serial.println("Robot in BACK mode");
       leftMotor->run(BACKWARD);
       rightMotor->run(BACKWARD);
+
+      if(sensorMesure()){
+        count ++;
+        if(count == 5){
+          currentState = STOP; 
+        }else{
+          moteurGauche->run(RELEASE);
+          moteurDroit->run(RELEASE);
+          delay(1000);
+          sendBluetoothMessage("Direction: GO");
+          currentState = GO;
+        }
+      }
       break;
 
     case STOP:
@@ -75,6 +126,17 @@ void loop() {
   }
 
   delay(1000);
+}
+bool sensorMesure(){
+  distance = sonar.ping_cm();
+
+  if (distance > 0 && distance < MAX_DISTANCE) {  
+    Serial.println("OBSTACLE DETECTE!!");
+    return true;
+  } else {
+    Serial.println("Aucun obsatcle");
+  }
+  return false; 
 }
 
 void sendBluetoothMessage(String message) {
