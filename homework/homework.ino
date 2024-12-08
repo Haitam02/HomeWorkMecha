@@ -130,7 +130,7 @@ void loop() {
 bool sensorMesure(){
   distance = sonar.ping_cm();
 
-  if (distance < MAX_DISTANCE) {  
+  if (distance > 0 && distance < MAX_DISTANCE) {  
     Serial.println("OBSTACLE DETECTE!!");
     return true;
   } else {
